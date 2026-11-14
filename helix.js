@@ -342,8 +342,8 @@
   const back = $("back"), front = $("front"), bctx = back.getContext("2d"), fctx = front.getContext("2d");
   const layerBack = $("nodes-back"), layerFront = $("nodes-front"), space = $("space");
   const PERSP = 1600;
-  let W, H, dpr, R, L, S, CX, RATE, LITE = false, STATIC = false, lastW = 0;
-  let offset = 0, spin = 0, hoverSlow = 1, last = performance.now();
+  let W, H, dpr, R, L, S, CX, RATE, TILE = false, lastW = 0;
+  let offset = 0, spin = 0, spinVel = 0, hoverSlow = 1, last = performance.now();
   const spinSpeed = 0.00028;
   const caseEl = $("case");
 
@@ -380,21 +380,26 @@
   const layout = () => {
     W = window.innerWidth; H = window.innerHeight; lastW = W;
     const small = W < 760;
-    LITE = small || (navigator.hardwareConcurrency || 8) <= 4;
-    // phones and touch tablets: draw the helix once and let native scrolling move it (no per-frame work)
-    STATIC = small || (window.matchMedia("(pointer: coarse)").matches && W < 1100);
-    document.body.classList.toggle("static", STATIC);
-    dpr = Math.min(window.devicePixelRatio || 1, LITE ? 1.25 : 2);
-    for (const c of [back, front]) { c.width = W * dpr; c.height = H * dpr; c.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0); }
+    // phones, touch devices and low-core machines: strands are pre-rendered once and slid by the GPU
+    TILE = small || window.matchMedia("(pointer: coarse)").matches || (navigator.hardwareConcurrency || 8) <= 4;
+    document.body.classList.toggle("tile", TILE);
     R = small ? W * 0.27 : Math.min(W * 0.13, 220);
     L = R * 2 * 1.6;
-    // consecutive nodes alternate strands; a 0.3-turn rise per node puts each next chip ~72° further round,
+    // consecutive nodes alternate strands; a 0.3-turn rise per node puts each next chip ~72 deg further round,
     // so chips spiral around both sides instead of stacking on one
     S = Math.max(small ? 96 : 120, L * 0.3);
     CX = small ? W * 0.5 : W * 0.34 + (W - W * 0.34) * 0.5 - 10;
-    RATE = STATIC ? 1 : 0.75;
+    RATE = 0.75;
     space.style.height = ((NODES.length - 1) * S) / RATE + H + "px";
-    if (STATIC) buildStatic();
+    els.forEach((e) => { e.f._w = e.b._w = 0; });
+    if (TILE) buildBands();
+    else {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      for (const c of [back, front]) {
+        c.style.height = ""; c.style.transform = "";
+        c.width = W * dpr; c.height = H * dpr; c.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+    }
   };
   const nodeY = (i) => i * S;
   const scrollToNode = (i) => window.scrollTo({ top: nodeY(i) / RATE, behavior: reduce ? "auto" : "smooth" });
@@ -402,13 +407,13 @@
   const at = (y, s) => {
     const th = (2 * Math.PI * y) / L + spin + (s ? Math.PI : 0);
     const x = R * Math.sin(th), z = R * Math.cos(th), k = PERSP / (PERSP - z);
-    return { sx: CX + x * k, sy: H / 2 + (y - offset) * (STATIC ? 1 : k), z, side: Math.sin(th) };
+    return { sx: CX + x * k, sy: H / 2 + (y - offset) * (TILE ? 1 : k), z, side: Math.sin(th) };
   };
 
   const drawStrands = () => {
     bctx.clearRect(0, 0, W, H); fctx.clearRect(0, 0, W, H);
     const y0 = offset - H / 2 - 60, y1 = offset + H / 2 + 60;
-    const rung = LITE ? 22 : 18;
+    const rung = 18;
     bctx.lineWidth = 1;
     for (let y = Math.floor(y0 / rung) * rung; y <= y1; y += rung) {
       const a = at(y, 0), b = at(y, 1);
@@ -418,7 +423,7 @@
     for (let s = 0; s < 2; s++) {
       const col = s ? "90,190,255" : "76,245,200";
       let prev = at(y0, s);
-      const segs = LITE ? 9 : 5;
+      const segs = 5;
       for (let y = y0 + segs; y <= y1; y += segs) {
         const q = at(y, s), depth = (1 + (q.z + prev.z) / (2 * R)) / 2;
         const ctx = q.z >= 0 ? fctx : bctx;
@@ -431,6 +436,7 @@
   };
 
   let activeGroup = "";
+  const setVis = (el, v) => { if (el._v !== v) { el._v = v; el.style.visibility = v ? "visible" : "hidden"; } };
   const placeNodes = () => {
     let nearest = 0, nd = 1e9;
     NODES.forEach((n, i) => {
@@ -438,111 +444,108 @@
       const depth = (1 + p.z / R) / 2;
       const { f, b } = els[i];
       const isFront = p.z >= 0, show = isFront ? f : b, hide = isFront ? b : f;
-      hide.style.visibility = "hidden";
-      if (p.sy < -60 || p.sy > H + 60) { show.style.visibility = "hidden"; return; }
-      show.style.visibility = "visible";
+      setVis(hide, false);
+      const dc = Math.abs(p.sy - H / 2);
+      if (dc < nd) { nd = dc; nearest = i; }
+      if (p.sy < -60 || p.sy > H + 60) { setVis(show, false); return; }
+      setVis(show, true);
       const flip = p.side < 0;
-      show.classList.toggle("flip", flip);
+      if (show._flip !== flip) { show._flip = flip; show.classList.toggle("flip", flip); }
       const scale = (n.flag ? 0.92 : 0.82) + 0.3 * depth;
       const w = (show._w ||= show.offsetWidth || 150) * scale;
       let left = flip ? p.sx - w + 15 * scale : p.sx - 15 * scale;
       left = Math.max(8, Math.min(W - w - 8, left));            // never run off the screen edge
-      show.style.transform = `translate(${left.toFixed(1)}px, ${p.sy.toFixed(1)}px) translateY(-50%) scale(${scale.toFixed(3)})`;
-      show.style.opacity = (0.28 + 0.72 * depth).toFixed(3);
-      if (!LITE) show.style.filter = depth < 0.4 ? `blur(${((0.4 - depth) * 4).toFixed(2)}px)` : "none";
-      show.style.zIndex = String(Math.round(depth * 100));
-      const dc = Math.abs(p.sy - H / 2);
-      if (dc < nd) { nd = dc; nearest = i; }
+      show.style.transform = `translate3d(${left.toFixed(1)}px, ${p.sy.toFixed(1)}px, 0) translateY(-50%) scale(${scale.toFixed(3)})`;
+      show.style.opacity = (0.28 + 0.72 * depth).toFixed(2);
+      if (!TILE) show.style.filter = depth < 0.4 ? `blur(${((0.4 - depth) * 4).toFixed(2)}px)` : "none";
+      const z = Math.round(depth * 20);
+      if (show._z !== z) { show._z = z; show.style.zIndex = String(z); }
     });
     const g = NODES[nearest].g;
     if (g !== activeGroup) { activeGroup = g; groupBtns.forEach(({ key, b }) => b.classList.toggle("on", key === g)); }
   };
 
-  /* ---------- static mode: one drawing for the whole page, native scrolling ---------- */
-  const buildStatic = () => {
-    spin = 0.9; offset = 0;
-    const docH = (NODES.length - 1) * S + H;
-    const scale = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(12e6 / (W * docH)));   // stay under mobile canvas limits
-    back.style.height = docH + "px";
-    back.width = Math.round(W * scale); back.height = Math.round(docH * scale);
-    bctx.setTransform(scale, 0, 0, scale, 0, 0);
-    bctx.clearRect(0, 0, W, docH);
-    const y0 = -H / 2 - 40, y1 = docH - H / 2 + 40;
-    // base pairs
-    bctx.lineWidth = 1;
-    for (let y = y0; y <= y1; y += 20) {
-      const a = at(y, 0), b = at(y, 1);
-      bctx.strokeStyle = `rgba(83,218,228,${(0.08 + 0.09 * (1 + Math.max(a.z, b.z) / R) / 2).toFixed(3)})`;
-      bctx.beginPath(); bctx.moveTo(a.sx, a.sy); bctx.lineTo(b.sx, b.sy); bctx.stroke();
+  /* ---------- tile mode: strands drawn once; a rotating helix looks identical to one sliding along its axis,
+     so spin and scroll become a single GPU transform per frame ---------- */
+  const buildBands = () => {
+    const bandH = Math.ceil(Math.max(H, window.screen.height || 0) + L + 60);
+    const sc = Math.min(window.devicePixelRatio || 1, 2);
+    for (const c of [back, front]) {
+      c.width = Math.round(W * sc); c.height = Math.round(bandH * sc); c.style.height = bandH + "px";
+      const ctx = c.getContext("2d"); ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.clearRect(0, 0, W, bandH);
     }
-    // backbones: back half dim and thin, front half bright and thick
-    for (const frontPass of [false, true]) {
-      for (let st = 0; st < 2; st++) {
-        const col = st ? "90,190,255" : "76,245,200";
-        let prev = at(y0, st);
-        for (let y = y0 + 4; y <= y1; y += 4) {
-          const q = at(y, st);
-          if ((q.z >= 0) === frontPass) {
-            const depth = (1 + (q.z + prev.z) / (2 * R)) / 2;
-            bctx.strokeStyle = `rgba(${col},${(0.14 + 0.6 * depth).toFixed(3)})`;
-            bctx.lineWidth = 0.9 + 2.2 * depth;
-            bctx.beginPath(); bctx.moveTo(prev.sx, prev.sy); bctx.lineTo(q.sx, q.sy); bctx.stroke();
-          }
-          prev = q;
-        }
+    const pt = (r, st) => {
+      const th = (2 * Math.PI * r) / L + (st ? Math.PI : 0);
+      const x = R * Math.sin(th), z = R * Math.cos(th);
+      return { x: CX + x * (PERSP / (PERSP - z)), y: r, z };
+    };
+    // base pairs: spacing divides one turn exactly, so the pattern wraps seamlessly
+    const rung = L / Math.round(L / 19);
+    bctx.lineWidth = 1;
+    for (let r = 0; r <= bandH + rung; r += rung) {
+      const a = pt(r, 0), b = pt(r, 1);
+      bctx.strokeStyle = `rgba(83,218,228,${(0.08 + 0.09 * (1 + Math.max(a.z, b.z) / R) / 2).toFixed(3)})`;
+      bctx.beginPath(); bctx.moveTo(a.x, a.y); bctx.lineTo(b.x, b.y); bctx.stroke();
+    }
+    // backbones: back halves on the back band, front halves (with neon glow) on the front band
+    for (let st = 0; st < 2; st++) {
+      const col = st ? "90,190,255" : "76,245,200";
+      fctx.shadowColor = `rgba(${col},0.75)`; fctx.shadowBlur = 10;
+      let prev = pt(-4, st);
+      for (let r = -1; r <= bandH + 4; r += 3) {
+        const q = pt(r, st), depth = (1 + (q.z + prev.z) / (2 * R)) / 2;
+        const ctx = q.z >= 0 ? fctx : bctx;
+        ctx.strokeStyle = `rgba(${col},${(0.12 + 0.62 * depth).toFixed(3)})`;
+        ctx.lineWidth = 0.8 + 2.4 * depth; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+        prev = q;
       }
     }
-    // chips: placed once in page coordinates; every chip stays tappable
-    layerFront.style.height = docH + "px";
-    NODES.forEach((n, i) => {
-      const p = at(nodeY(i), i % 2), depth = (1 + p.z / R) / 2;
-      const { f, b } = els[i];
-      b.style.visibility = "hidden";
-      f.style.visibility = "visible"; f.style.filter = "none";
-      const flip = p.side < 0;
-      f.classList.toggle("flip", flip);
-      const sc = (n.flag ? 0.95 : 0.86) + 0.14 * depth;
-      const w = (f.offsetWidth || 150) * sc;
-      let left = flip ? p.sx - w + 15 * sc : p.sx - 15 * sc;
-      left = Math.max(8, Math.min(W - w - 8, left));
-      f.style.transform = `translate(${left.toFixed(1)}px, ${p.sy.toFixed(1)}px) translateY(-50%) scale(${sc.toFixed(3)})`;
-      f.style.opacity = (0.6 + 0.4 * depth).toFixed(2);
-      f.style.zIndex = String(Math.round(depth * 100));
-    });
+    fctx.shadowBlur = 0;
   };
-
-  let scrollQueued = false;
-  window.addEventListener("scroll", () => {
-    if (!STATIC || scrollQueued) return;
-    scrollQueued = true;
-    requestAnimationFrame(() => {
-      scrollQueued = false;
-      const y = window.scrollY;
-      hero.classList.toggle("dim", y > 120);
-      hint.style.opacity = y > 60 ? "0" : "1";
-      const i = Math.max(0, Math.min(NODES.length - 1, Math.round(y / S)));
-      const g = NODES[i].g;
-      if (g !== activeGroup) { activeGroup = g; groupBtns.forEach(({ key, b }) => b.classList.toggle("on", key === g)); }
-    });
-  }, { passive: true });
+  const slideBands = () => {
+    const u = offset - H / 2 + (spin * L) / (2 * Math.PI);
+    const t = `translate3d(0,${(-(((u % L) + L) % L)).toFixed(2)}px,0)`;
+    back.style.transform = t; front.style.transform = t;
+  };
 
   const hero = $("hero"), hint = $("hint");
-  let lastDraw = 0;
   const tick = (now) => {
-    if (STATIC) return;
-    if (LITE && now - lastDraw < 33) { requestAnimationFrame(tick); return; }
-    lastDraw = now;
     const dt = Math.min(64, now - last); last = now;
     const target = window.scrollY * RATE;
-    offset += (target - offset) * (reduce ? 1 : 0.14);
+    offset += (target - offset) * (reduce ? 1 : 1 - Math.pow(0.86, dt / 16.7));
     if (caseEl.hidden) {
       if (!reduce) spin += spinSpeed * hoverSlow * dt + (target - offset) * 0.0006;
-      drawStrands(); placeNodes();
+      spin += spinVel * dt; spinVel *= Math.pow(0.94, dt / 16.7);
+      if (Math.abs(spinVel) < 1e-6) spinVel = 0;
+      if (TILE) slideBands(); else drawStrands();
+      placeNodes();
     }
-    hero.classList.toggle("dim", window.scrollY > 120);
-    hint.style.opacity = window.scrollY > 60 ? "0" : "1";
+    const y = window.scrollY;
+    if ((y > 120) !== hero._dim) { hero._dim = y > 120; hero.classList.toggle("dim", hero._dim); }
+    if ((y > 60) !== hint._off) { hint._off = y > 60; hint.style.opacity = hint._off ? "0" : "1"; }
     requestAnimationFrame(tick);
   };
+
+  /* ---------- swipe or drag sideways to spin the helix, with momentum ---------- */
+  let grab = null;
+  space.addEventListener("pointerdown", (e) => {
+    grab = { id: e.pointerId, x: e.clientX, y: e.clientY, t: e.timeStamp, on: false };
+  });
+  window.addEventListener("pointermove", (e) => {
+    if (!grab || e.pointerId !== grab.id) return;
+    const dx = e.clientX - grab.x;
+    if (!grab.on) {
+      if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - grab.y)) return;
+      grab.on = true; document.body.classList.add("spinning");
+    }
+    const dt = Math.max(8, e.timeStamp - grab.t), dTh = dx / (R * 1.6);
+    spin += dTh; spinVel = spinVel * 0.4 + (dTh / dt) * 0.6;
+    grab.x = e.clientX; grab.y = e.clientY; grab.t = e.timeStamp;
+  });
+  const release = (e) => { if (grab && e.pointerId === grab.id) { grab = null; document.body.classList.remove("spinning"); } };
+  window.addEventListener("pointerup", release);
+  window.addEventListener("pointercancel", release);
 
   /* ================= case study ================= */
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -743,10 +746,10 @@
   });
   window.addEventListener("resize", () => {
     // mobile browsers fire resize when the URL bar hides; only rebuild when the width really changes
-    if (STATIC && window.innerWidth === lastW) return;
-    const wasStatic = STATIC;
+    if (TILE && window.innerWidth === lastW) {
+      H = window.innerHeight; space.style.height = ((NODES.length - 1) * S) / RATE + H + "px"; return;
+    }
     layout();
-    if (wasStatic && !STATIC) { offset = window.scrollY * RATE; requestAnimationFrame(tick); }
     if (!caseEl.hidden) scatter(false);
   });
 
