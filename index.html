@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Adnan Shamim Dar · AI Researcher &amp; Medical AI Evaluator</title>
+<meta name="description" content="Adnan Shamim Dar's work, mapped onto a living DNA helix. Click any node to open its mind map." />
+<link rel="canonical" href="https://adnan-shamim-dar.github.io/" />
+<meta name="theme-color" content="#05070a" />
+<meta property="og:url" content="https://adnan-shamim-dar.github.io/" />
+<meta property="og:title" content="Adnan Shamim Dar · AI Researcher &amp; Medical AI Evaluator" />
+<meta property="og:description" content="My work, mapped onto a living DNA helix. Click any node for the case study and proof." />
+<meta property="og:image" content="https://adnan-shamim-dar.github.io/assets/portrait.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="helix.css?v=4" />
+</head>
+<body>
+
+<nav class="view-switch" aria-label="Choose a view"><a href="classic.html">Classic</a><a href="index.html" class="on" aria-current="page">Strand <span class="vs-dot" aria-hidden="true"></span></a></nav>
+<section class="sr-only" aria-label="Summary">
+  <h2>Adnan Shamim Dar: AI Researcher and Medical AI Evaluator</h2>
+  <p>Trusted-tier expert QA reviewer on Mercor (Project Odin), selected for the top-performer incentive. 20+ AI training projects across Mercor, micro1, Outlier (Scale AI), Labelbox/Alignerr and Ermis: medical-expert evaluation, RLHF preference ranking, red-teaming voice agents, robotics video annotation, design grading and Italian multilingual work.</p>
+  <p>Research and builds: Genesis (artificial life), NeoResist-MD (computational oncology, founder), Tandem (private multi-device AI runtime), refusal-gate (PubMed-grounded refusal for medical LLMs), MedViva.</p>
+  <p>MD candidate, Università Politecnica delle Marche; IMAT 104th worldwide; ERDIS merit scholar; English (IELTS 8.5), Italian, Arabic, Hindi, Urdu. Contact: dar.adnan.54@gmail.com.</p>
+  <p><a href="classic.html">Read the full portfolio as a classic page</a> · <a href="cv/Adnan_Shamim_Dar_CV.pdf">Download CV</a></p>
+</section>
+<canvas id="back" aria-hidden="true"></canvas>
+<div id="nodes-back" class="nodes" aria-hidden="true"></div>
+<canvas id="front" aria-hidden="true"></canvas>
+<div id="nodes-front" class="nodes"></div>
+
+<aside class="panel">
+  <div class="hero" id="hero">
+    <p class="kick"><span class="dot"></span>The strand</p>
+    <h1>Adnan Shamim Dar</h1>
+    <p class="role">AI Researcher · Medical AI Evaluator</p>
+    <p class="tag">Every piece of my work, mapped onto one strand. Scroll to travel it. Click any node for the full case study and proof.</p>
+  </div>
+
+  <nav class="groups" id="groups" aria-label="Sections"></nav>
+
+  <div class="panel-foot">
+        <a class="solid" href="cv/Adnan_Shamim_Dar_CV.pdf">CV</a>
+  </div>
+</aside>
+
+<p class="scroll-hint" id="hint"><span class="mouse"></span>Scroll the strand · click a node</p>
+
+<!-- case study -->
+<div class="case" id="case" role="dialog" aria-modal="true" aria-labelledby="cs-title" hidden>
+  <header class="cs-bar">
+    <button class="cs-back" id="cs-close"><span aria-hidden="true">←</span> Back to the strand <kbd>Esc</kbd></button>
+    <p class="cs-crumb" id="cs-crumb"></p>
+    <div class="cs-step">
+      <button id="cs-prev" aria-label="Previous"><span aria-hidden="true">←</span> <span class="lbl" id="cs-prev-l"></span></button>
+      <button id="cs-next" aria-label="Next"><span class="lbl" id="cs-next-l"></span> <span aria-hidden="true">→</span></button>
+    </div>
+  </header>
+  <div class="cs-scroll" id="cs-scroll">
+    <article class="cs-wrap">
+      <section class="cs-hero">
+        <p class="cs-kicker" id="cs-kicker"></p>
+        <h2 id="cs-title"></h2>
+        <p class="cs-meta" id="cs-meta"></p>
+        <p class="cs-summary" id="cs-summary"></p>
+        <ul class="cs-results" id="cs-results"></ul>
+      </section>
+      <div class="cs-grid">
+        <div class="cs-text">
+          <h3>What I did</h3>
+          <ul class="cs-did" id="cs-did"></ul>
+          <div id="cs-verify-wrap"><h3>Verify</h3><ul class="cs-verify" id="cs-verify"></ul></div>
+          <h3>Skills</h3>
+          <ul class="cs-tags" id="cs-tags"></ul>
+        </div>
+        <div class="cs-proof">
+          <div class="pb-head">
+            <h3>Proof <span id="pb-count"></span></h3>
+            <div class="pb-tools">
+              <span class="pb-tip">Drag to move · click to inspect</span>
+              <button id="pb-tidy">Tidy</button><button id="pb-scatter">Scatter</button>
+            </div>
+          </div>
+          <div class="board" id="board"></div>
+          <p class="pb-note" id="pb-note"></p>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+
+<!-- proof viewer -->
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Proof viewer" hidden>
+  <div class="vw-stage" id="vw-stage"><img id="vw-img" alt="" draggable="false" /></div>
+  <p class="vw-cap" id="vw-cap"></p>
+  <div class="vw-tools">
+    <button id="vw-out" aria-label="Zoom out">−</button>
+    <span id="vw-zoom">100%</span>
+    <button id="vw-in" aria-label="Zoom in">+</button>
+    <button id="vw-fit">Fit</button>
+  </div>
+  <button class="vw-nav prev" id="vw-prev" aria-label="Previous proof">←</button>
+  <button class="vw-nav next" id="vw-next" aria-label="Next proof">→</button>
+  <button class="vw-close" id="vw-close" aria-label="Close viewer">Esc ×</button>
+</div>
+
+<div id="space" class="space"></div>
+
+<noscript>
+  <style>.panel{position:static}.space,canvas,.nodes,.scroll-hint{display:none}</style>
+  <p style="padding:24px">This view needs JavaScript. <a href="classic.html">Open the classic portfolio</a>.</p>
+</noscript>
+
+<script src="helix.js?v=4" defer></script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+{
+  "name": "Adnan Shamim Dar",
+  "title": "Medical doctor in training, biomedical AI evaluator, and translational oncology researcher",
+  "location": "Ancona, Italy",
+  "contact": {
+    "email": "dar.adnan.54@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/adnan-shamim-dar-85664b230/",
+    "github": "https://github.com/Adnan-shamim-dar",
+    "orcid": "https://orcid.org/0009-0008-9711-0252",
+    "scholar": ""
+  },
+  "summary": [
+    "Medical doctor in training (Year 4 of 6, Medicine and Surgery, Università Politecnica delle Marche), admitted 104th globally and 7th institutional in the IMAT and supported by the ERDIS fully funded merit scholarship. Work spans clinical reasoning, biomedical AI evaluation, translational oncology, and scientific annotation.",
+    "Founder, NeoResist-MD (independent computational-oncology research project): a solo-built, resistance-aware neoantigen prioritization project with one held-out validated melanoma result and reviewable artifacts.",
+    "Comfortable reviewing AI-generated medical and scientific work, documenting structured judgments, and communicating across English, Italian, Arabic, Hindi, and Urdu."
+  ],
+  "highlights": [
+    "IMAT admission rank: 104th globally, 7th institutional",
+    "ERDIS fully funded merit scholarship",
+    "AI evaluator at Outlier since December 2025, across generalist and medical-expert tracks",
+    "Aether, White Coat, and Almanac expert review work",
+    "NeoResist-MD / NeoVax translational oncology research",
+    "Autoresearch, Project Genesis, and Reel Logger: independent research and engineering projects",
+    "AI evaluation work on agents, function calling, and red-teaming",
+    "MedViva medical oral-exam simulation and product design",
+    "MATLAB and biomedical signal processing",
+    "Polyglot communication in English, Italian, Arabic, Hindi, and Urdu"
+  ],
+  "projects": [
+    {
+      "name": "Outlier Health Work",
+      "type": "AI evaluation, medical QA, and expert review",
+      "what_it_proves": "Clinical judgment, structured evaluation, hallucination checking, and health-domain judgment.",
+      "story": "I kept the health-domain Outlier work under one umbrella so the generalist, medical-expert, and Almanac tracks stay easy to follow.",
+      "subprojects": [
+        "Aether - Generalist",
+        "White Coat - Medical Expert",
+        "Almanac - Medical Expert"
+      ],
+      "evidence": [
+        "task screenshots grouped by Outlier subtrack",
+        "annotated rubric notes and review summaries",
+        "decision notes that explain what was corrected and why"
+      ],
+      "featured_images": [
+        {
+          "src": "assets/outlier/outlier-dashboard.png",
+          "alt": "Outlier dashboard overview",
+          "caption": "Umbrella view for the Outlier work."
+        },
+        {
+          "src": "assets/outlier/aether/Screenshot 2026-02-20 120612.png",
+          "alt": "Aether skills screen",
+          "caption": "Generalist track and skill labels."
+        },
+        {
+          "src": "assets/outlier/white-coat/Screenshot 2026-04-09 090500.png",
+          "alt": "White Coat project overview",
+          "caption": "Role, rate, and status in one place."
+        },
+        {
+          "src": "assets/outlier/almanac/Screenshot 2026-04-09 064001.png",
+          "alt": "Almanac tasking paused screen",
+          "caption": "Almanac task screen."
+        }
+      ],
+      "captions": [
+        {
+          "title": "Medical response review",
+          "caption": "Medical answer review for accuracy, completeness, and reasoning structure.",
+          "why_it_matters": "Structured evaluation."
+        },
+        {
+          "title": "Hallucination check",
+          "caption": "Checked a response for unsupported claims, missing caveats, and wrong medical statements.",
+          "why_it_matters": "Judgment, not just typing."
+        },
+        {
+          "title": "Rubric-based scoring",
+          "caption": "Task rubric used to score the answer and explain the decision plainly.",
+          "why_it_matters": "Fits AI training and QA work."
+        }
+      ]
+    },
+    {
+      "name": "Aether - Generalist",
+      "parent": "Outlier",
+      "type": "Outlier generalist work",
+      "what_it_proves": "Breadth, instruction following, and the ability to handle open-ended tasks across domains.",
+      "story": "Generalist review work. Read the prompt, compare the response, keep notes, move on.",
+      "evidence": [
+        "generalist task screenshots",
+        "response review notes",
+        "instruction-following checks"
+      ],
+      "featured_images": [
+        {
+          "src": "assets/outlier/aether/Screenshot 2026-02-20 120612.png",
+          "alt": "Aether skills screen",
+          "caption": "Skills screen before I started."
+        },
+        {
+          "src": "assets/outlier/aether/Screenshot 2026-03-05 181627.png",
+          "alt": "Aether review details with task cards",
+          "caption": "Review cards and recent task history."
+        }
+      ],
+      "captions": [
+        {
+          "title": "Generalist task review",
+          "caption": "Mixed-domain task review. I noted what held up and what needed work."
+        },
+        {
+          "title": "Instruction following",
+          "caption": "Prompt structure and constraints."
+        }
+      ]
+    },
+    {
+      "name": "White Coat - Medical Expert",
+      "parent": "Outlier",
+      "type": "Outlier medical expert work",
+      "what_it_proves": "Clinical judgment, medical knowledge, and careful review of health-domain outputs.",
+      "story": "Medical-expert review. Prompt, answer, and notes side by side.",
+      "evidence": [
+        "medical task screenshots",
+        "expert review notes",
+        "rubric and evaluation captures"
+      ],
+      "featured_images": [
+        {
+          "src": "assets/outlier/white-coat/Screenshot 2026-04-09 090500.png",
+          "alt": "White Coat project overview",
+          "caption": "Role, timing, and status."
+        },
+        {
+          "src": "assets/outlier/white-coat/Screenshot 2026-04-09 074235.png",
+          "alt": "White Coat task screen",
+          "caption": "One of the task screens."
+        }
+      ],
+      "captions": [
+        {
+          "title": "Medical expert review",
+          "caption": "Accuracy, nuance, and safety."
+        },
+        {
+          "title": "Risk flagging",
+          "caption": "Parts that needed correction or a tighter caveat."
+        }
+      ]
+    },
+    {
+      "name": "Almanac - Medical Expert",
+      "parent": "Outlier",
+      "type": "Outlier medical expert work",
+      "what_it_proves": "Medical reasoning, consistency checking, and expert evaluation in a health setting.",
+      "story": "Structured medical review. Keep the format notes open, stay consistent.",
+      "evidence": [
+        "almanac screenshots",
+        "medical response comparisons",
+        "feedback notes"
+      ],
+      "featured_images": [
+        {
+          "src": "assets/outlier/almanac/Screenshot 2026-04-09 064001.png",
+          "alt": "Almanac tasking paused screen",
+          "caption": "Paused mid-task."
+        },
+        {
+          "src": "assets/outlier/almanac/Screenshot 2026-04-04 133945.png",
+          "alt": "Almanac project heading",
+          "caption": "Project heading."
+        }
+      ],
+      "captions": [
+        {
+          "title": "Expert comparison",
+          "caption": "I compared the answer with the medical standard and wrote down the gap."
+        },
+        {
+          "title": "Clinical rewrite",
+          "caption": "I rewrote the answer so it fit the framing and felt a bit tighter."
+        }
+      ]
+    },
+    {
+      "name": "NeoResist-MD / NeoVax",
+      "type": "Translational oncology and neoantigen ranking",
+      "what_it_proves": "Independent research ability, reproducible analysis, and cancer-focused computational thinking.",
+      "story": "This is the main thing I’m proud of. NeoResist-MD gets the front seat because that’s what the work deserves. It is an independent computational-oncology research project, solo-built and unpublished.",
+      "evidence": [
+        "held-out melanoma validation (Sahin 2017): mean patient AUC 0.470 → 0.575 (Δ +0.105, CI 0.511–0.630)",
+        "claim-tiered framework (discovery, held-out, support-only) with audit trails and case-level provenance",
+        "evaluation protocol pre-specified and deposited retrospectively on OSF",
+        "paper drafts, validation tables, ranked winners CSVs, figures and screenshots"
+      ],
+      "featured_images": [
+        {
+          "src": "assets/neovax/Screenshot 2026-05-02 201952.png",
+          "alt": "NeoVax pipeline started and ranked list",
+          "caption": "Pipeline and ranked output in one shot."
+        },
+        {
+          "src": "assets/neovax/Screenshot 2026-04-18 222600.png",
+          "alt": "NeoVax module stack panel and radar chart",
+          "caption": "Dashboard view for the module stack."
+        },
+        {
+          "src": "assets/neovax/Screenshot 2026-04-11 140513.png",
+          "alt": "NeoVax TMB versus fanout bubble chart",
+          "caption": "The analysis side of the project."
+        }
+      ],
+      "captions": [
+        {
+          "title": "Validation table",
+          "caption": "Validation table from the paper draft, with each result tiered as discovery, held-out validated, or support-only.",
+          "why_it_matters": "Claims are graded by how they were validated."
+        },
+        {
+          "title": "Ranked outputs",
+          "caption": "Ranked candidate list from the NeoResist-MD pipeline.",
+          "why_it_matters": "Actual system output."
+        },
+        {
+          "title": "Paper excerpt",
+          "caption": "Draft excerpt covering the biological rationale, dataset setup, and validation logic.",
+          "why_it_matters": "Research maturity."
+        }
+      ]
+    },
+    {
+      "name": "MedViva",
+      "type": "AI oral-exam simulation for medical students",
+      "what_it_proves": "Product thinking, clinical pedagogy, and human-AI interaction design.",
+      "story": "Product and demo work. Practice mode, exam mode, uploads, feedback loops.",
+      "evidence": [
+        "demo screenshots",
+        "workflow notes",
+        "question-response examples"
+      ],
+      "featured_images": [
+        {
+          "src": "assets/medviva/Screenshot 2026-03-22 173340.png",
+          "alt": "MedViva landing page with practice and exam modes",
+          "caption": "MedViva landing page showing the split between practice and exam modes, which is the core product idea: a structured oral-exam training experience.",
+          "proof": "Shows the product direction and the user-facing design language."
+        },
+        {
+          "src": "assets/medviva/Screenshot 2026-03-23 165915.png",
+          "alt": "MedViva question library browser with exam question",
+          "caption": "Question library browser showing a medical MCQ with difficulty tags and answer options, demonstrating how the training flow surfaces targeted practice material.",
+          "proof": "Shows interactive question delivery and structured medical content handling."
+        },
+        {
+          "src": "assets/medviva/Screenshot 2026-03-28 224254.png",
+          "alt": "MedViva upload workflow",
+          "caption": "Upload workflow screen showing how study material or PDFs are brought into the system, which supports the idea that the tutor can be driven from user content.",
+          "proof": "Shows how the project ingests source material for AI-assisted practice."
+        }
+      ],
+      "captions": [
+        {
+          "title": "Prompt generation",
+          "caption": "Structured oral-exam prompt from the selected topic and difficulty.",
+          "why_it_matters": "Not just a static Q&A page."
+        },
+        {
+          "title": "Answer interruption",
+          "caption": "The assistant interrupts a long explanation to keep the pacing realistic.",
+          "why_it_matters": "Human-AI interaction design."
+        },
+        {
+          "title": "Evaluation feedback",
+          "caption": "Scored the answer and pointed out what was strong, missing, and worth improving.",
+          "why_it_matters": "Educational utility."
+        }
+      ]
+    },
+    {
+      "name": "Autoresearch",
+      "type": "Refusal-gated discovery engine (AI for science)",
+      "what_it_proves": "That a discovery pipeline can be built to refuse: honest search under small samples, with claims graded by where the evidence came from.",
+      "story": "Built inside NeoResist-MD to search for interpretable neoantigen ranking formulas, with a core that is domain-generic. The search itself is standard. The part I care about is the gate: code that decides what the engine is allowed to claim, and stays silent when the evidence cannot support a claim.",
+      "evidence": [
+        "40,135 ledger rows and 21,848 unique formulas evaluated",
+        "0 claims promoted to “validated” by its own gate, which is the intended behaviour, not a failure",
+        "a code audit found gate and measurement bugs; they are being fixed before any methods claim is made",
+        "work in progress and unpublished"
+      ]
+    },
+    {
+      "name": "Project Genesis",
+      "type": "Artificial-life research (in progress)",
+      "what_it_proves": "Independent research design: a simulation built without a fitness function, with null baselines and self-audits applied to its own results.",
+      "story": "An artificial-life programme asking what emerges when single-cell agents face real death and no fitness function. I treat it as a test of method as much as of the idea: it has already caught and corrected a headline metric that a null control showed to be largely artifact, and a bug that had silently discarded most births.",
+      "evidence": [
+        "fitness-function-free simulation of single-cell agents under existential stakes",
+        "powered ablations and null-baseline controls, with 455 automated tests",
+        "own earlier results audited and corrected",
+        "unpublished; a framework paper is in preparation"
+      ]
+    },
+    {
+      "name": "Reel Logger",
+      "type": "Agentic pipeline (personal automation)",
+      "what_it_proves": "Building and running a working agentic system with sensible safety boundaries, not just prompting one.",
+      "story": "Share a saved reel to a Telegram bot and it comes back as a structured note in my Obsidian vault with the useful part already extracted.",
+      "evidence": [
+        "Telegram bot → Cloudflare Worker (queue, deduplication) → local processor → Claude → Obsidian note",
+        "local processor: video download, frame extraction and speech-to-text, then Claude summarises transcript, caption and frames",
+        "safety design: the model gets no file or shell tools, and captions and video are treated as untrusted input",
+        "verified end to end in October 2026, including on an Instagram reel"
+      ]
+    },
+    {
+      "name": "AI Evaluation",
+      "type": "Agent, function-calling, and red-team evaluation",
+      "what_it_proves": "Evaluation skills beyond medical answer review: testing agents that call tools, and probing them for safety and injection failures.",
+      "story": "Outside Outlier I have been working on evaluation of AI agents. It applies the same instinct for rubrics, gold sets, and “is the improvement real?” to agent behaviour.",
+      "evidence": [
+        "Mercor “Introduction to Agents” certificate, completed 11 October 2026 (no. MRC-2026-H2D5H9QV, verifiable at <a href=\"https://work.mercor.com/learn/verify/MRC-2026-H2D5H9QV\" target=\"_blank\" rel=\"noreferrer\">work.mercor.com</a>)",
+        "Labelbox voice-agent evaluation task (October 2026): a recorded call to a front-desk agent for a fictional clinic, covering function-call correctness, a safety-refusal test and a prompt-injection test; completed"
+      ]
+    }
+  ]
+}
