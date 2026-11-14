@@ -342,7 +342,7 @@
   const back = $("back"), front = $("front"), bctx = back.getContext("2d"), fctx = front.getContext("2d");
   const layerBack = $("nodes-back"), layerFront = $("nodes-front"), space = $("space");
   const PERSP = 1600;
-  let W, H, dpr, R, L, S, CX, RATE, LITE = false;
+  let W, H, dpr, R, L, S, CX, RATE, LITE = false, STATIC = false, lastW = 0;
   let offset = 0, spin = 0, hoverSlow = 1, last = performance.now();
   const spinSpeed = 0.00028;
   const caseEl = $("case");
@@ -378,9 +378,12 @@
   });
 
   const layout = () => {
-    W = window.innerWidth; H = window.innerHeight;
+    W = window.innerWidth; H = window.innerHeight; lastW = W;
     const small = W < 760;
     LITE = small || (navigator.hardwareConcurrency || 8) <= 4;
+    // phones and touch tablets: draw the helix once and let native scrolling move it (no per-frame work)
+    STATIC = small || (window.matchMedia("(pointer: coarse)").matches && W < 1100);
+    document.body.classList.toggle("static", STATIC);
     dpr = Math.min(window.devicePixelRatio || 1, LITE ? 1.25 : 2);
     for (const c of [back, front]) { c.width = W * dpr; c.height = H * dpr; c.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0); }
     R = small ? W * 0.27 : Math.min(W * 0.13, 220);
@@ -389,8 +392,9 @@
     // so chips spiral around both sides instead of stacking on one
     S = Math.max(small ? 96 : 120, L * 0.3);
     CX = small ? W * 0.5 : W * 0.34 + (W - W * 0.34) * 0.5 - 10;
-    RATE = 0.75;
+    RATE = STATIC ? 1 : 0.75;
     space.style.height = ((NODES.length - 1) * S) / RATE + H + "px";
+    if (STATIC) buildStatic();
   };
   const nodeY = (i) => i * S;
   const scrollToNode = (i) => window.scrollTo({ top: nodeY(i) / RATE, behavior: reduce ? "auto" : "smooth" });
@@ -398,7 +402,7 @@
   const at = (y, s) => {
     const th = (2 * Math.PI * y) / L + spin + (s ? Math.PI : 0);
     const x = R * Math.sin(th), z = R * Math.cos(th), k = PERSP / (PERSP - z);
-    return { sx: CX + x * k, sy: H / 2 + (y - offset) * k, z, side: Math.sin(th) };
+    return { sx: CX + x * k, sy: H / 2 + (y - offset) * (STATIC ? 1 : k), z, side: Math.sin(th) };
   };
 
   const drawStrands = () => {
@@ -454,9 +458,78 @@
     if (g !== activeGroup) { activeGroup = g; groupBtns.forEach(({ key, b }) => b.classList.toggle("on", key === g)); }
   };
 
+  /* ---------- static mode: one drawing for the whole page, native scrolling ---------- */
+  const buildStatic = () => {
+    spin = 0.9; offset = 0;
+    const docH = (NODES.length - 1) * S + H;
+    const scale = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(12e6 / (W * docH)));   // stay under mobile canvas limits
+    back.style.height = docH + "px";
+    back.width = Math.round(W * scale); back.height = Math.round(docH * scale);
+    bctx.setTransform(scale, 0, 0, scale, 0, 0);
+    bctx.clearRect(0, 0, W, docH);
+    const y0 = -H / 2 - 40, y1 = docH - H / 2 + 40;
+    // base pairs
+    bctx.lineWidth = 1;
+    for (let y = y0; y <= y1; y += 20) {
+      const a = at(y, 0), b = at(y, 1);
+      bctx.strokeStyle = `rgba(83,218,228,${(0.08 + 0.09 * (1 + Math.max(a.z, b.z) / R) / 2).toFixed(3)})`;
+      bctx.beginPath(); bctx.moveTo(a.sx, a.sy); bctx.lineTo(b.sx, b.sy); bctx.stroke();
+    }
+    // backbones: back half dim and thin, front half bright and thick
+    for (const frontPass of [false, true]) {
+      for (let st = 0; st < 2; st++) {
+        const col = st ? "90,190,255" : "76,245,200";
+        let prev = at(y0, st);
+        for (let y = y0 + 4; y <= y1; y += 4) {
+          const q = at(y, st);
+          if ((q.z >= 0) === frontPass) {
+            const depth = (1 + (q.z + prev.z) / (2 * R)) / 2;
+            bctx.strokeStyle = `rgba(${col},${(0.14 + 0.6 * depth).toFixed(3)})`;
+            bctx.lineWidth = 0.9 + 2.2 * depth;
+            bctx.beginPath(); bctx.moveTo(prev.sx, prev.sy); bctx.lineTo(q.sx, q.sy); bctx.stroke();
+          }
+          prev = q;
+        }
+      }
+    }
+    // chips: placed once in page coordinates; every chip stays tappable
+    layerFront.style.height = docH + "px";
+    NODES.forEach((n, i) => {
+      const p = at(nodeY(i), i % 2), depth = (1 + p.z / R) / 2;
+      const { f, b } = els[i];
+      b.style.visibility = "hidden";
+      f.style.visibility = "visible"; f.style.filter = "none";
+      const flip = p.side < 0;
+      f.classList.toggle("flip", flip);
+      const sc = (n.flag ? 0.95 : 0.86) + 0.14 * depth;
+      const w = (f.offsetWidth || 150) * sc;
+      let left = flip ? p.sx - w + 15 * sc : p.sx - 15 * sc;
+      left = Math.max(8, Math.min(W - w - 8, left));
+      f.style.transform = `translate(${left.toFixed(1)}px, ${p.sy.toFixed(1)}px) translateY(-50%) scale(${sc.toFixed(3)})`;
+      f.style.opacity = (0.6 + 0.4 * depth).toFixed(2);
+      f.style.zIndex = String(Math.round(depth * 100));
+    });
+  };
+
+  let scrollQueued = false;
+  window.addEventListener("scroll", () => {
+    if (!STATIC || scrollQueued) return;
+    scrollQueued = true;
+    requestAnimationFrame(() => {
+      scrollQueued = false;
+      const y = window.scrollY;
+      hero.classList.toggle("dim", y > 120);
+      hint.style.opacity = y > 60 ? "0" : "1";
+      const i = Math.max(0, Math.min(NODES.length - 1, Math.round(y / S)));
+      const g = NODES[i].g;
+      if (g !== activeGroup) { activeGroup = g; groupBtns.forEach(({ key, b }) => b.classList.toggle("on", key === g)); }
+    });
+  }, { passive: true });
+
   const hero = $("hero"), hint = $("hint");
   let lastDraw = 0;
   const tick = (now) => {
+    if (STATIC) return;
     if (LITE && now - lastDraw < 33) { requestAnimationFrame(tick); return; }
     lastDraw = now;
     const dt = Math.min(64, now - last); last = now;
@@ -668,7 +741,14 @@
       else if (e.key === "ArrowLeft") step(-1);
     }
   });
-  window.addEventListener("resize", () => { layout(); if (!caseEl.hidden) scatter(false); });
+  window.addEventListener("resize", () => {
+    // mobile browsers fire resize when the URL bar hides; only rebuild when the width really changes
+    if (STATIC && window.innerWidth === lastW) return;
+    const wasStatic = STATIC;
+    layout();
+    if (wasStatic && !STATIC) { offset = window.scrollY * RATE; requestAnimationFrame(tick); }
+    if (!caseEl.hidden) scatter(false);
+  });
 
   /* ---------- boot ---------- */
   layout();
